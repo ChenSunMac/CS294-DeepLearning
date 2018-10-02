@@ -18,6 +18,8 @@ import gym
 import load_policy
 
 def main():
+    
+    ## Parsing the arguments
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('expert_policy_file', type=str)
@@ -29,19 +31,21 @@ def main():
     args = parser.parse_args()
 
     print('loading and building expert policy')
-    policy_fn = load_policy.load_policy(args.expert_policy_file)
+    # load the expert_policy
+    policy_fn = load_policy.load_policy(args.expert_policy_file) 
     print('loaded and built')
 
     with tf.Session():
         tf_util.initialize()
 
         import gym
-        env = gym.make(args.envname)
+        env = gym.make(args.envname) # make environment
         max_steps = args.max_timesteps or env.spec.timestep_limit
 
         returns = []
         observations = []
         actions = []
+        # one rollout = one trajectory test
         for i in range(args.num_rollouts):
             print('iter', i)
             obs = env.reset()
@@ -60,7 +64,7 @@ def main():
                 if steps % 100 == 0: print("%i/%i"%(steps, max_steps))
                 if steps >= max_steps:
                     break
-            returns.append(totalr)
+            returns.append(totalr) # each iteration append the total reward 
 
         print('returns', returns)
         print('mean return', np.mean(returns))
